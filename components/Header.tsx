@@ -1,12 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import {
+  BellIcon,
+  ChatIcon,
+  ChevronDownIcon,
   FlagIcon,
   HomeIcon,
   PlayIcon,
   SearchIcon,
   ShoppingCartIcon,
   UserGroupIcon,
+  ViewGridIcon,
 } from '@heroicons/react/solid';
 import HeaderIcon from './HeaderIcon';
 
@@ -27,7 +31,7 @@ function Header() {
           <SearchIcon className="h-6 text-gray-600" />
           <input
             type="text"
-            className="flex ml-2 items-center bg-transparent outline-none placeholder-gray-500 flex-shrink"
+            className="hidden md:inline-flex ml-2 items-center bg-transparent outline-none placeholder-gray-500 flex-shrink"
             placeholder="Search Facebooc"
           />
         </div>
@@ -43,6 +47,14 @@ function Header() {
         </div>
       </div>
       {/* Right */}
+      <div className="flex items-center sm:space-x-2 justify-end">
+        {/* 프로필 이미지 */}
+        <p className="whitespace-nowrap font-semibold pr-3">Typemean</p>
+        <ViewGridIcon className="icon" />
+        <ChatIcon className="icon" />
+        <BellIcon className="icon" />
+        <ChevronDownIcon className="icon" />
+      </div>
     </div>
   );
 }
