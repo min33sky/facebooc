@@ -19,8 +19,6 @@ function InputBox() {
 
       if (!inputRef.current?.value || !session) return;
 
-      console.log('input-value: ', inputRef.current.value);
-
       //* Firestore에 저장
       const doc = await db.collection('posts').add({
         message: inputRef.current.value,
@@ -57,8 +55,6 @@ function InputBox() {
           }
         );
       }
-
-      console.log('doc: ', doc);
 
       //* 인풋 초기화
       inputRef.current.value = '';
