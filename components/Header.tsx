@@ -13,10 +13,13 @@ import {
   ViewGridIcon,
 } from '@heroicons/react/solid';
 import HeaderIcon from './HeaderIcon';
+import { signOut, useSession } from 'next-auth/client';
 
 function Header() {
+  const [session] = useSession();
+
   return (
-    <div className="sticky top-0 z-50 flex items-center p-2 bg-white lg:px-5">
+    <div className="sticky top-0 z-50 flex items-center p-2 bg-white shadow-lg lg:px-5">
       {/* Left */}
       <div className="flex items-center ">
         <Image
@@ -50,8 +53,17 @@ function Header() {
 
       {/* Right */}
       <div className="flex items-center justify-end sm:space-x-2">
-        {/* 프로필 이미지 */}
-        <p className="pr-3 font-semibold whitespace-nowrap">Typemean</p>
+        <Image
+          onClick={() => signOut()}
+          className="rounded-full cursor-pointer"
+          src={session?.user?.image!}
+          alt="profile_image"
+          width={40}
+          height={40}
+          layout="fixed"
+        />
+
+        <p className="pr-3 font-semibold whitespace-nowrap">{session?.user?.name}</p>
         <ViewGridIcon className="icon" />
         <ChatIcon className="icon" />
         <BellIcon className="icon" />
