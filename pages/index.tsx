@@ -7,8 +7,15 @@ import Feed from '../components/Feed';
 import Header from '../components/Header';
 import Login from '../components/Login';
 import Sidebar from '../components/Sidebar';
+import Widget from '../components/Widget';
+import { db } from '../firebase';
 
-const Home: NextPage<{ session: Session | null }> = ({ session }) => {
+interface IHome {
+  session: Session | null;
+  posts: any[];
+}
+
+function Home({ session, posts }: IHome) {
   if (!session) return <Login />;
 
   return (
@@ -25,20 +32,30 @@ const Home: NextPage<{ session: Session | null }> = ({ session }) => {
         {/* Sidebar */}
         <Sidebar />
         {/* Feed */}
-        <Feed />
+        <Feed posts={posts} />
         {/* Widget */}
+        <Widget />
       </main>
     </div>
   );
-};
+}
 
 export async function getServerSideProps(context: any) {
   // Get the user
   const session = await getSession(context);
 
+  const posts = await db.collection('posts').orderBy('timestamp', 'desc').get();
+
+  const docs = posts.docs.map((post) => ({
+    id: post.id,
+    ...post.data(),
+    timestamp: null,
+  }));
+
   return {
     props: {
       session,
+      posts: docs,
     },
   };
 }

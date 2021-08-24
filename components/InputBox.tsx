@@ -1,26 +1,28 @@
-import React, { MutableRefObject, useCallback, useRef } from 'react';
+import React, { MutableRefObject, useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/client';
 import { CameraIcon, EmojiHappyIcon, VideoCameraIcon } from '@heroicons/react/solid';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import firebase from 'firebase';
 
 function InputBox() {
   const [session] = useSession();
   const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
   const filepickerRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+  const [imageToPost, setImageToPost] = useState<string | undefined>('');
+
+  const removeImage = useCallback(() => setImageToPost(''), []);
 
   const sendPost = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      if (!session) return;
-      if (!inputRef.current?.value) return;
+      if (!inputRef.current?.value || !session) return;
 
       console.log('input-value: ', inputRef.current.value);
 
       //* Firestore에 저장
-      await db.collection('posts').add({
+      const doc = await db.collection('posts').add({
         message: inputRef.current.value,
         name: session.user?.name,
         email: session.user?.email,
@@ -28,18 +30,60 @@ function InputBox() {
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
+      //* 이미지가 있을 경우 이미지를 storage에 저장
+      if (imageToPost) {
+        const uploadTask = storage.ref(`posts/${doc.id}`).putString(imageToPost, 'data_url');
+
+        removeImage();
+
+        uploadTask.on(
+          'state_change',
+          null,
+          (error) => console.error(error),
+          () => {
+            // when the upload completes
+            storage
+              .ref('posts')
+              .child(doc.id)
+              .getDownloadURL()
+              .then((url) => {
+                db.collection(`posts`).doc(doc.id).set(
+                  {
+                    postImage: url,
+                  },
+                  { merge: true }
+                );
+              });
+          }
+        );
+      }
+
+      console.log('doc: ', doc);
+
+      //* 인풋 초기화
       inputRef.current.value = '';
     },
-    [session]
+    [session, imageToPost, removeImage]
   );
 
   const addImageToPost = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('이미지 올리기 핸들러');
+    const reader = new FileReader();
+
+    if (e.target.files && e.target.files?.length > 0) {
+      reader.readAsDataURL(e.target.files[0]); // ? 이미지의 미리보기 URL을 가져오기
+    }
+
+    reader.onload = (readerEvent) => {
+      const result = readerEvent.target?.result as string | undefined;
+      setImageToPost(result);
+    };
+    e.target.value = '';
   }, []);
 
-  const onClickImageUpload = useCallback((e: React.MouseEvent) => {
-    filepickerRef.current?.click();
-  }, []);
+  const onClickImageUpload = useCallback(
+    (e: React.MouseEvent) => filepickerRef.current?.click(),
+    []
+  );
 
   return (
     <div className="p-2 mt-6 font-medium text-gray-500 bg-white shadow-md rounded-2xl">
@@ -63,6 +107,16 @@ function InputBox() {
             Submit
           </button>
         </form>
+
+        {imageToPost && (
+          <div
+            onClick={removeImage}
+            className="flex flex-col items-center transition transform cursor-pointer filter hover:brightness-110 hover:scale-105"
+          >
+            <img className="object-contain h-10" src={imageToPost} alt="thumbnail" />
+            <p className="text-xs text-center text-red-500">Remove</p>
+          </div>
+        )}
       </div>
 
       <div className="flex p-3 border-t justify-evenly">
