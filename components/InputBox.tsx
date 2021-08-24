@@ -1,12 +1,44 @@
-import React, { useCallback } from 'react';
+import React, { MutableRefObject, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/client';
+import { CameraIcon, EmojiHappyIcon, VideoCameraIcon } from '@heroicons/react/solid';
+import { db } from '../firebase';
+import firebase from 'firebase';
 
 function InputBox() {
   const [session] = useSession();
+  const inputRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+  const filepickerRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
 
-  const sendPost = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const sendPost = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (!session) return;
+      if (!inputRef.current?.value) return;
+
+      console.log('input-value: ', inputRef.current.value);
+
+      //* Firestore에 저장
+      await db.collection('posts').add({
+        message: inputRef.current.value,
+        name: session.user?.name,
+        email: session.user?.email,
+        image: session.user?.image,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
+      inputRef.current.value = '';
+    },
+    [session]
+  );
+
+  const addImageToPost = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('이미지 올리기 핸들러');
+  }, []);
+
+  const onClickImageUpload = useCallback((e: React.MouseEvent) => {
+    filepickerRef.current?.click();
   }, []);
 
   return (
@@ -22,6 +54,7 @@ function InputBox() {
         />
         <form className="flex flex-1" onSubmit={sendPost}>
           <input
+            ref={inputRef}
             className="flex-grow h-12 px-5 bg-gray-100 rounded-full focus:outline-none"
             type="text"
             placeholder={`무슨 말이라도 해봐요, ${session?.user?.name}?`}
@@ -30,6 +63,24 @@ function InputBox() {
             Submit
           </button>
         </form>
+      </div>
+
+      <div className="flex p-3 border-t justify-evenly">
+        <div className="inputIcon">
+          <VideoCameraIcon className="text-red-500 h-7" />
+          <p className="text-xs sm:text-sm xl:text-base">Live Video</p>
+        </div>
+
+        <div className="inputIcon" onClick={onClickImageUpload}>
+          <CameraIcon className="text-green-400 h-7" />
+          <p className="text-xs sm:text-sm xl:text-base">Photo/Video</p>
+          <input type="file" ref={filepickerRef} onChange={addImageToPost} hidden />
+        </div>
+
+        <div className="inputIcon">
+          <EmojiHappyIcon className="text-yellow-300 h-7" />
+          <p className="text-xs sm:text-sm xl:text-base">Feeling/Activity</p>
+        </div>
       </div>
     </div>
   );
