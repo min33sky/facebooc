@@ -1,8 +1,14 @@
 import type { NextPage } from 'next';
+import { Session } from 'next-auth';
+import { getSession } from 'next-auth/client';
 import Head from 'next/head';
+import React from 'react';
 import Header from '../components/Header';
+import Login from '../components/Login';
 
-const Home: NextPage = () => {
+const Home: NextPage<{ session: Session | null }> = ({ session }) => {
+  if (!session) return <Login />;
+
   return (
     <div className="">
       <Head>
@@ -12,8 +18,25 @@ const Home: NextPage = () => {
       </Head>
 
       <Header />
+
+      {/* Sidebar */}
+
+      {/* Twits */}
+
+      {/* Widget */}
     </div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  // Get the user
+  const session = await getSession(context);
+
+  return {
+    props: {
+      session,
+    },
+  };
+}
 
 export default Home;
