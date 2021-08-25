@@ -2,8 +2,7 @@ import React, { MutableRefObject, useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/client';
 import { CameraIcon, EmojiHappyIcon, VideoCameraIcon } from '@heroicons/react/solid';
-import { db, storage } from '../firebase';
-import firebase from 'firebase';
+import { db, storage, firebase } from '../firebase';
 
 function InputBox() {
   const [session] = useSession();

@@ -34,7 +34,13 @@ function Post({ email, image, message, name, timestamp, postImage }: IPost) {
 
       {postImage && (
         <div className="relative h-56 bg-white md:h-96">
-          <Image src={postImage} alt="post_image" layout="fill" />
+          <Image
+            src={postImage}
+            alt="post_image"
+            layout="fill"
+            placeholder="blur"
+            blurDataURL={postImage}
+          />
         </div>
       )}
 
