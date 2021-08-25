@@ -16,7 +16,14 @@ function Post({ email, image, message, name, timestamp, postImage }: IPost) {
     <div className="flex flex-col">
       <div className="p-5 mt-5 bg-white shadow-sm rounded-t-2xl">
         <div className="flex items-center space-x-2">
-          <img className="rounded-full" src={image} alt="profile_image" width={40} height={40} />
+          <Image
+            className="rounded-full"
+            src={image}
+            alt="profile_image"
+            width={40}
+            height={40}
+            layout="fixed"
+          />
           <div>
             <p className="font-medium">{name}</p>
             {timestamp ? (

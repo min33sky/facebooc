@@ -49,7 +49,7 @@ export async function getServerSideProps(context: any) {
   const docs = posts.docs.map((post) => ({
     id: post.id,
     ...post.data(),
-    timestamp: null,
+    timestamp: null, //? SSR 체크할 때 사용. (Post Component에서 loading 표시할 때)
   }));
 
   return {

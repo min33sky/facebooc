@@ -2,13 +2,14 @@
 
 ## Description
 
-....
+facebook clone
 
 ## Modules
 
 - nextjs
 - tailwindcss
 - [NextAuth](https://next-auth.js.org/)
+- firebase
 
 ## Coding Note
 

@@ -4,31 +4,35 @@ import Contact from './Contact';
 
 const contacts = [
   {
-    name: 'Sonny Sangha',
+    username: 'Sonny Sangha',
     src: 'https://links.papareact.com/zof',
   },
   {
-    name: 'Elon Musk',
+    username: 'Elon Musk',
     src: 'https://links.papareact.com/4zn',
   },
   {
-    name: 'Zeff Bezoz',
+    username: 'Zeff Bezoz',
     src: 'https://links.papareact.com/k2j',
   },
   {
-    name: 'Mark Zuckerberg',
+    username: 'Mark Zuckerberg',
     src: 'https://links.papareact.com/xql',
   },
   {
-    name: 'Bill Gates',
+    username: 'Bill Gates',
     src: 'https://links.papareact.com/4u4',
   },
   {
-    name: 'Harry Potter',
+    username: 'Harry Potter',
     src: 'https://links.papareact.com/d0c',
   },
 ];
 
+/**
+ * 우측 사이드 연락처 위젯
+ * @returns
+ */
 function Widget() {
   return (
     <div className="flex-col hidden p-2 mt-5 lg:flex w-60">
@@ -42,7 +46,7 @@ function Widget() {
       </div>
 
       {contacts.map((contact) => (
-        <Contact key={contact.src} src={contact.src} name={contact.name} />
+        <Contact key={contact.src} src={contact.src} username={contact.username} />
       ))}
     </div>
   );
